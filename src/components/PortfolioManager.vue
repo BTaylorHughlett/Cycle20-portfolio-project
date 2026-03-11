@@ -171,6 +171,91 @@
 
 <script setup>
 // TODO Make it work!
+/**
+*This is where we:
+*Store state
+*React to user's actions
+*call the monday service file
+*decide what happens when buttons are clicked!
+ */
+// computed: create a valu based on other reactive values
+// onMounted: runs code when the component first appears on the page
+// reactive: stores our form's objects
+// ref: stores simple reactive values, arrays, booleans, and strings
+import {computed, onMounted, reactive, ref} from "vue";
+
+// TODO Import service file's functions
+
+/**
+ * Reactive State!
+ * 
+ * PortfolioManager, state includes:
+ * -portfolio items
+ * -loading files
+ * -success/error messages
+ * -which items we are editing
+ * -the form values
+ */
+const items = ref ([]);
+const isLoading = ref(false);
+const isBusy = ref(false);
+const message = ref("");
+const errorMessage = ref("");
+const editingItemId = ref("");
+
+const createEmptyForm = () => ({
+  title: "",
+  description: "",
+  techStack: "",
+  status: "",
+  githubLink: "",
+  imageUrl: ""
+})
+// Holds the values from th inputs in the template above
+const form = reactive(createEmptyForm());
+
+// isEditing becomes TRUE when editingItemId has a value, otherwise FALSE
+// Control the text of the buttons ("Save Changes","Create Item","Cancel Edit")
+const isEditing = computed(() => Boolean(editingItemId.value));
+
+//Clears success/error messages BEFORE a new action begins
+const resetMessages = () => {
+  message.value = "",
+  errorMessage.value = "",
+};
+
+//Reset the form back to blank values AND returns to CREATE mode.
+const resetForm = () => {
+  // 1. clears ALL form fields
+  Objects.assign(from createEmptyForm());
+  // 2. clear the editingItemId
+  editingitemId.value = "";
+};
+
+/**
+ * READ FUNCTION
+ * The service file TALKS to monday.com
+ * Dedcide what the UI (what the user sees) should do BEFORE and AFTER that call (API).
+ * Specifically:
+ * -clear old messages
+ * -turn on the loading states
+ * -ask the service for items
+ * -save those items into the component state
+ * -show success or error feedback
+ * -turn loading state OFF
+*/
+const loadItems = async () => {
+  resetMessages();
+  isLoading.value = true;
+  try {
+    items.value = await fetchPortfolioItems();
+    message.value = "Yay!! Portfolio items loaded from monday.com!";
+  } catch (error){
+    errorMessage.value = error.message || "Oh no! :(We did not load the items from monday.com!"
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <style scoped>
